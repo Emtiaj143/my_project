@@ -1,0 +1,11 @@
+# Ignore log files
+*.log
+
+# Ignore compiled files
+*.exe
+*.out
+
+# Ignore folders
+node_modules/
+build/
+
