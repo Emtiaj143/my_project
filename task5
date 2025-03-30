@@ -1,0 +1,87 @@
+<?php
+
+class Collatz {
+    /** Parent class implementing the 3x+1 function */
+    protected int $startValue;  // Protected variable (accessible to child class)
+
+    public function __construct(int $startValue) {
+        $this->startValue = $startValue;
+    }
+
+    public function computeSequence(): array {
+        /** Computes the Collatz sequence starting from the given value */
+        $n = $this->startValue;
+        $sequence = [];
+
+        while ($n != 1) {
+            $sequence[] = $n;
+            $n = ($n % 2 == 0) ? $n / 2 : 3 * $n + 1;
+        }
+        $sequence[] = 1;
+        return $sequence;
+    }
+}
+
+class CollatzStats extends Collatz {
+    /** Child class that adds statistics calculation */
+    
+    private const MIN_VALUE = 1;  // Minimum value for sequence (fixed)
+    private const MAX_ITERATIONS = 1000; // Max iterations to avoid infinite loops
+    private const HISTOGRAM_SYMBOL = '*'; // Symbol for histogram representation
+
+    public function __construct(int $startValue) {
+        parent::__construct($startValue);
+    }
+
+    public function computeHistogram(int $n, int $m): void {
+        /** Computes histogram of iteration values for the range [n, m] */
+        
+        if ($n < self::MIN_VALUE || $m < self::MIN_VALUE) {
+            echo "Values must be greater than or equal to " . self::MIN_VALUE . ".\n";
+            return;
+        }
+        
+        if ($n > $m) {
+            echo "Invalid range. Ensure n <= m.\n";
+            return;
+        }
+
+        $histogram = [];
+
+        // Iterate through the range [n, m]
+        for ($num = $n; $num <= $m; $num++) {
+            $sequence = (new Collatz($num))->computeSequence();
+            foreach ($sequence as $value) {
+                if (!isset($histogram[$value])) {
+                    $histogram[$value] = 0;
+                }
+                $histogram[$value]++;
+            }
+        }
+
+        // Output HTML table
+        echo "<html>\n";
+        echo "<head>\n";
+        echo "<title>Collatz Sequence Histogram</title>\n";
+        echo "</head>\n";
+        echo "<body>\n";
+        echo "<h2>Collatz Sequence Histogram for range [$n, $m]</h2>\n";
+        echo "<table border='1' cellpadding='5' cellspacing='0'>\n";
+        echo "<tr><th>Value</th><th>Frequency</th></tr>\n";
+
+        // Loop through histogram and display each value and frequency in the table
+        foreach ($histogram as $value => $count) {
+            echo "<tr><td>" . $value . "</td><td>" . $count . "</td></tr>\n";
+        }
+
+        echo "</table>\n";
+        echo "</body>\n";
+        echo "</html>\n";
+    }
+}
+
+// Example Usage
+$collatzStats = new CollatzStats(5);
+$collatzStats->computeHistogram(1, 10);
+
+?>
